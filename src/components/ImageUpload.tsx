@@ -83,8 +83,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   const handleRemoveImage = async () => {
     if (!currentImage) return;
     
-    // Note: We'll handle actual deletion in the parent component
-    // since we need to know the image path
     setPreview('');
     onImageUpload('', '');
   };
