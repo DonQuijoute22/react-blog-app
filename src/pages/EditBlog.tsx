@@ -3,13 +3,16 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { type RootState } from "../store/store";
 import { supabase } from "../lib/supabase";
+import ImageUpload from '../components/ImageUpload'; 
 
 interface BlogData {
   id: string;
   title: string;
   content: string;
   author_id: string;
-  author_email?: string; // Optional since older blogs might not have it
+  author_email?: string; 
+  image_url?: string; 
+  image_path?: string;
   created_at: string;
   updated_at: string;
 }
@@ -18,6 +21,8 @@ export default function EditBlog() {
   const { id } = useParams<{ id: string }>();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [imagePath, setImagePath] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -56,6 +61,8 @@ export default function EditBlog() {
 
       setTitle(data.title);
       setContent(data.content);
+      setImageUrl(data.image_url || "");
+      setImagePath(data.image_path || "");
 
     console.log("Existing author email:", blogData.author_email);
 
@@ -64,6 +71,11 @@ export default function EditBlog() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleImageUpload = (url: string, path: string) => {
+    setImageUrl(url);
+    setImagePath(path);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -99,7 +111,9 @@ export default function EditBlog() {
         .update({
           title: title.trim(),
           content: content.trim(),
-          author_email: user.email, 
+          author_email: user.email,
+          image_url: imageUrl,
+          image_path: imagePath, 
           updated_at: new Date().toISOString(),
         })
         .eq("id", id);
@@ -123,6 +137,16 @@ export default function EditBlog() {
     }
 
     try {
+       // Delete image if exists
+      if (imagePath) {
+        const { error: storageError } = await supabase.storage
+          .from('blog-images')
+          .remove([imagePath]);
+        
+        if (storageError) console.error('Failed to delete image:', storageError);
+      }
+      
+      // Delete blog
       const { error } = await supabase.from("blogs").delete().eq("id", id);
       if (error) throw error;
       navigate("/");
@@ -134,6 +158,26 @@ export default function EditBlog() {
   const handleCancel = () => {
     if (window.confirm("Are you sure you want to discard changes?")) {
       navigate("/");
+    }
+  };
+
+   const handleDeleteImage = async () => {
+    if (!imagePath) return;
+
+    try {
+      // Delete from storage
+      const { error: storageError } = await supabase.storage
+        .from('blog-images')
+        .remove([imagePath]);
+
+      if (storageError) throw storageError;
+
+      // Clear image state
+      setImageUrl('');
+      setImagePath('');
+
+    } catch (err: any) {
+      setError('Failed to delete image: ' + err.message);
     }
   };
 
@@ -177,6 +221,30 @@ export default function EditBlog() {
             </button>
           </div>
         </div>
+
+         {/* ADD IMAGE UPLOAD SECTION */}
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <label className="block text-lg font-medium text-gray-900">
+                    Blog Cover Image (Optional)
+                  </label>
+                  {imageUrl && (
+                    <button
+                      type="button"
+                      onClick={handleDeleteImage}
+                      className="text-sm text-red-600 hover:text-red-800"
+                      disabled={saving}
+                    >
+                      Remove Image
+                    </button>
+                  )}
+                </div>
+                <ImageUpload 
+                  onImageUpload={handleImageUpload}
+                  currentImage={imageUrl}
+                  disabled={saving}
+                />
+              </div>
 
         {/* Success Message */}
         {success && (

@@ -11,6 +11,8 @@ interface Blog {
   author_id: string;
   created_at: string;
   author_email: string;
+  image_url?: string; 
+  image_path?: string;     
   updated_at: string;
 }
 
@@ -117,12 +119,20 @@ export default function BlogList() {
     return pages;
   };
 
-  const handleDelete = async (id: string, title: string) => {
+  const handleDelete = async (id: string, title: string, imagePath?: string) => {
     if (!window.confirm(`Are you sure you want to delete "${title}"?`)) {
       return;
     }
 
     try {
+      // Delete image from storage
+      if (imagePath) {
+      await supabase.storage
+        .from('blog-images')
+        .remove([imagePath]);
+    }
+
+      // Delete blog from database
       const { error } = await supabase.from("blogs").delete().eq("id", id);
       if (error) throw error;
       
@@ -138,6 +148,8 @@ export default function BlogList() {
       alert("Failed to delete blog: " + err.message);
     }
   };
+
+  
 
   if (loading && blogs.length === 0) {
     return (
@@ -276,8 +288,19 @@ export default function BlogList() {
                 return (
                   <div
                     key={blog.id}
-                    className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100"
-                  >
+                    className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100">
+
+                    {/* ADD IMAGE AT TOP OF CARD */}
+                    {blog.image_url && (
+                      <div className="h-48 overflow-hidden">
+                        <img 
+                          src={blog.image_url} 
+                          alt={blog.title}
+                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                    )}
+
                     <div className="p-6">
                       <div className="flex justify-between items-start mb-4">
                         <h2 className="text-xl font-bold text-gray-900 line-clamp-2 leading-tight">
@@ -300,7 +323,7 @@ export default function BlogList() {
                               </svg>
                             </Link>
                             <button
-                              onClick={() => handleDelete(blog.id, blog.title)}
+                              onClick={() => handleDelete(blog.id, blog.title, blog.image_path)}
                               className="text-red-600 hover:text-red-800 p-1 hover:bg-red-50 rounded transition"
                               title="Delete"
                             >
@@ -354,6 +377,7 @@ export default function BlogList() {
             {totalPages > 1 && (
               <div className="bg-white rounded-xl shadow-md p-6">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+
                   {/* Page Info */}
                   <div className="text-gray-700">
                     Showing <span className="font-semibold">{blogs.length}</span> of{" "}

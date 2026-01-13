@@ -3,14 +3,23 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { type RootState } from "../store/store";
 import { supabase } from "../lib/supabase";
+import ImageUpload from '../components/ImageUpload'; 
 
 export default function CreateBlog() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [imagePath, setImagePath] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { user } = useSelector((state: RootState) => state.auth);
+
+
+  const handleImageUpload = (url: string, path: string) => {
+    setImageUrl(url);
+    setImagePath(path);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,6 +61,8 @@ export default function CreateBlog() {
             content: content.trim(),
             author_id: user.id,
             author_email: user.email, 
+            image_url: imageUrl,
+            image_path: imagePath,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -100,6 +111,17 @@ export default function CreateBlog() {
           <h1 className="text-3xl font-bold text-gray-900">Create New Blog</h1>
           <p className="text-gray-600 mt-2">Share your thoughts with the world</p>
         </div>
+
+          {/* ADD IMAGE UPLOAD SECTION */}
+              <div>
+                <label className="block text-lg font-medium text-gray-900 mb-3">
+                  Blog Cover Image (Optional)
+                </label>
+                <ImageUpload 
+                  onImageUpload={handleImageUpload}
+                  disabled={loading}
+                />
+              </div>
 
         {/* Error Message */}
         {error && (

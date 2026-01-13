@@ -10,13 +10,12 @@ export default function Logout() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      // Perform logout
+      
       supabase.auth.signOut();
       dispatch(setUser(null));
-      
-      // Redirect to home
+     
       navigate("/");
-    }, 3000); // Show page for 3 seconds
+    }, 3000); 
 
     return () => clearTimeout(timer);
   }, [dispatch, navigate]);

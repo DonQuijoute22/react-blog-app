@@ -9,6 +9,8 @@ interface Blog {
   title: string;
   content: string;
   author_id: string;
+  image_url?: string; 
+  image_path?: string;
   created_at: string;
   updated_at: string;
 }
@@ -63,7 +65,7 @@ export default function BlogDetail() {
             setAuthor(userData);
           }
         } catch (e) {
-          // If we can't get email, just use ID
+          // if no email, just use ID
           setAuthor({ id: data.author_id });
         }
       }
