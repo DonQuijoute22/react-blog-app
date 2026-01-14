@@ -54,7 +54,7 @@ export default function BlogDetail() {
 
       // get author info
       if (data?.author_id) {
-        // to fetch from auth.users (if accessible)
+
         try {
           const { data: userData } = await supabase
             .from("users")
@@ -66,7 +66,8 @@ export default function BlogDetail() {
             setAuthor(userData);
           }
         } catch (e) {
-          // if no email, just use ID
+
+          // email or ID
           setAuthor({ id: data.author_id });
         }
       }
@@ -160,7 +161,8 @@ export default function BlogDetail() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-8 px-4">
       <div className="max-w-4xl mx-auto">
-        {/* Back Button */}
+
+        {/* back button */}
         <div className="mb-6">
           <Link
             to="/"
@@ -173,9 +175,10 @@ export default function BlogDetail() {
           </Link>
         </div>
 
-        {/* Blog Content Card */}
+        {/* blog content card */}
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          {/* Blog Header */}
+
+          {/* blog header */}
           <div className="p-8 border-b border-gray-200">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
               <div className="flex-1">
@@ -183,7 +186,7 @@ export default function BlogDetail() {
                   {blog.title}
                 </h1>
                 
-                {/* Author & Date Info */}
+                {/* author & date info */}
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center text-white font-semibold">
@@ -206,7 +209,7 @@ export default function BlogDetail() {
                 </div>
               </div>
               
-              {/* Action Buttons */}
+              {/* action buttons */}
               {isOwner && (
                 <div className="flex space-x-3">
                   <Link
@@ -248,6 +251,7 @@ export default function BlogDetail() {
           {/* Blog Content */}
           <div className="p-8">
             <div className="prose prose-lg max-w-none">
+              
               {/* Render content with preserved formatting */}
               <div className="whitespace-pre-wrap text-gray-700 leading-relaxed text-lg">
                 {blog.content.split('\n').map((paragraph, index) => (
@@ -288,13 +292,11 @@ export default function BlogDetail() {
           </div>
         </div>
 
-        {/* 🆕 COMMENTS SECTION - ADD THIS WHOLE SECTION */}
-        {/* Add an id="comments" so BlogList links can jump here */}
+        {/* comment section */}
         <div id="comments" className="mt-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Comments</h2>
           {id && <Comments blogId={id} />} {/* Pass the blog ID to Comments component */}
         </div>
-        {/* 🆕 END OF COMMENTS SECTION */}
 
         {/* Related Actions */}
         <div className="mt-8 flex flex-col sm:flex-row gap-4">

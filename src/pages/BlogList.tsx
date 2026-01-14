@@ -27,7 +27,7 @@ export default function BlogList() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalBlogs, setTotalBlogs] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const [commentCounts, setCommentCounts] = useState<Record<string, number>>({}); // NEW: Store comment counts
+  const [commentCounts, setCommentCounts] = useState<Record<string, number>>({}); 
   const { user } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export default function BlogList() {
     fetchTotalCount();
   }, [currentPage]);
 
-  // NEW: Fetch comment counts when blogs change
+  // fetch comment counts 
   useEffect(() => {
     if (blogs.length > 0) {
       fetchCommentCounts();
@@ -58,7 +58,7 @@ export default function BlogList() {
     }
   };
 
-  // NEW: Fetch comment counts for each blog
+  // fetch comment counts for each blog
   const fetchCommentCounts = async () => {
     try {
       const blogIds = blogs.map(blog => blog.id);
@@ -82,12 +82,12 @@ export default function BlogList() {
     }
   };
 
-  // Fetch blogs with pagination
+  // fetch blogs with pagination
   const fetchBlogs = async () => {
     try {
       setLoading(true);
       
-      // Calculate range for current page
+      // calculate range for current page
       const from = (currentPage - 1) * ITEMS_PER_PAGE;
       const to = from + ITEMS_PER_PAGE - 1;
 
@@ -97,7 +97,7 @@ export default function BlogList() {
         .order("created_at", { ascending: false })
         .range(from, to);
 
-      // Add search filter if it exists
+      // add search filter if it exists
       if (search.trim()) {
         query = query.or(`title.ilike.%${search}%,content.ilike.%${search}%`);
       }
@@ -119,21 +119,21 @@ export default function BlogList() {
     fetchBlogs();
   };
 
-  // Clear search
+  // clear search
   const handleClearSearch = () => {
     setSearch("");
     setCurrentPage(1);
     fetchBlogs();
   };
 
-  // Pagination controls
+  // pagination controls
   const goToPage = (page: number) => {
     if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Generate page numbers for pagination
+  // generate page numbers for pagination
   const getPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 5;
@@ -158,7 +158,7 @@ export default function BlogList() {
     }
 
     try {
-      // Delete image from storage
+      // delete image from storage
       if (imagePath) {
       await supabase.storage
         .from('blog-images')
@@ -169,11 +169,11 @@ export default function BlogList() {
       const { error } = await supabase.from("blogs").delete().eq("id", id);
       if (error) throw error;
       
-      // Refresh data
+      // refresh data
       fetchBlogs();
       fetchTotalCount();
       
-      // When item is deleted on a page, go to previous page
+      // return to previous page when deleted
       if (blogs.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
       }
@@ -181,7 +181,6 @@ export default function BlogList() {
       alert("Failed to delete blog: " + err.message);
     }
   };
-
   
 
   if (loading && blogs.length === 0) {
@@ -202,6 +201,7 @@ export default function BlogList() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-8 px-4">
       <div className="max-w-7xl mx-auto">
+
         {/* Header */}
         <div className="mb-10">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
@@ -261,7 +261,7 @@ export default function BlogList() {
           </div>
         </div>
 
-        {/* Error Display */}
+        {/* error display */}
         {error && (
           <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded mb-6">
             <div className="flex items-center">
@@ -273,7 +273,7 @@ export default function BlogList() {
           </div>
         )}
 
-        {/* Blog Grid */}
+        {/* blog grid */}
         {blogs.length === 0 ? (
           <div className="bg-white rounded-2xl shadow-md p-12 text-center">
             <div className="text-gray-400 mb-6">
@@ -316,15 +316,15 @@ export default function BlogList() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
               {blogs.map((blog) => {
                 const isOwner = user && user.id === blog.author_id;
-                const authorInitial = "U"; // Default initial
-                const commentCount = commentCounts[blog.id] || 0; // Get comment count for this blog
+                const authorInitial = "U"; 
+                const commentCount = commentCounts[blog.id] || 0; 
                 
                 return (
                   <div
                     key={blog.id}
                     className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100">
 
-                    {/* ADD IMAGE AT TOP OF CARD */}
+                    {/* image */}
                     {blog.image_url && (
                       <div className="h-48 overflow-hidden">
                         <img 
@@ -391,7 +391,7 @@ export default function BlogList() {
                             </div>
                           </div>
                           
-                          {/* NEW: Comment count and link */}
+                          {/* comment count and link */}
                           <div className="flex items-center space-x-4">
                             <div className="flex items-center text-sm text-gray-600">
                               <svg className="w-4 h-4 mr-1 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -412,7 +412,7 @@ export default function BlogList() {
                           </div>
                         </div>
                         
-                        {/* NEW: Comment preview (show latest comment if any) */}
+                        {/* comment preview */}
                         {commentCount > 0 && (
                           <div className="mt-3 pt-3 border-t border-gray-100">
                             <div className="flex items-start">
@@ -432,20 +432,20 @@ export default function BlogList() {
               })}
             </div>
 
-            {/* Pagination Controls */}
+            {/* pagination Controls */}
             {totalPages > 1 && (
               <div className="bg-white rounded-xl shadow-md p-6">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
 
-                  {/* Page Info */}
+                  {/* page Info */}
                   <div className="text-gray-700">
                     Showing <span className="font-semibold">{blogs.length}</span> of{" "}
                     <span className="font-semibold">{totalBlogs}</span> blogs
                   </div>
 
-                  {/* Page Numbers */}
+                  {/* page Numbers */}
                   <div className="flex items-center space-x-2">
-                    {/* First Page */}
+                    {/* first Page */}
                     <button
                       onClick={() => goToPage(1)}
                       disabled={currentPage === 1}
@@ -459,7 +459,7 @@ export default function BlogList() {
                       </svg>
                     </button>
 
-                    {/* Previous Page */}
+                    {/* previous page */}
                     <button
                       onClick={() => goToPage(currentPage - 1)}
                       disabled={currentPage === 1}
@@ -471,7 +471,7 @@ export default function BlogList() {
                       Previous
                     </button>
 
-                    {/* Page Numbers */}
+                    {/* page Numbers */}
                     {getPageNumbers().map((pageNum) => (
                       <button
                         key={pageNum}
@@ -485,7 +485,7 @@ export default function BlogList() {
                       </button>
                     ))}
 
-                    {/* Next Page */}
+                    {/* next Page */}
                     <button
                       onClick={() => goToPage(currentPage + 1)}
                       disabled={currentPage === totalPages}
@@ -497,7 +497,7 @@ export default function BlogList() {
                       Next
                     </button>
 
-                    {/* Last Page */}
+                    {/* last page */}
                     <button
                       onClick={() => goToPage(totalPages)}
                       disabled={currentPage === totalPages}
@@ -512,7 +512,7 @@ export default function BlogList() {
                     </button>
                   </div>
 
-                  {/* Page Selector */}
+                  {/* page selector */}
                   <div className="flex items-center space-x-2">
                     <span className="text-gray-700">Go to page:</span>
                     <select
@@ -529,7 +529,7 @@ export default function BlogList() {
                   </div>
                 </div>
                 
-                {/* NEW: Total comments summary */}
+                {/* comments summary */}
                 <div className="mt-6 pt-6 border-t border-gray-100 text-center">
                   <div className="inline-flex items-center text-sm text-gray-600">
                     <svg className="w-4 h-4 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
