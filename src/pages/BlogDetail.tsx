@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { useSelector } from "react-redux";
 import { type RootState } from "../store/store";
+import Comments from "../components/Comments"; 
 
 interface Blog {
   id: string;
@@ -286,6 +287,14 @@ export default function BlogDetail() {
             </div>
           </div>
         </div>
+
+        {/* 🆕 COMMENTS SECTION - ADD THIS WHOLE SECTION */}
+        {/* Add an id="comments" so BlogList links can jump here */}
+        <div id="comments" className="mt-12">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Comments</h2>
+          {id && <Comments blogId={id} />} {/* Pass the blog ID to Comments component */}
+        </div>
+        {/* 🆕 END OF COMMENTS SECTION */}
 
         {/* Related Actions */}
         <div className="mt-8 flex flex-col sm:flex-row gap-4">

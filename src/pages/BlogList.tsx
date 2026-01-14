@@ -1,3 +1,4 @@
+// src/pages/BlogList.tsx
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
@@ -26,12 +27,20 @@ export default function BlogList() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalBlogs, setTotalBlogs] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [commentCounts, setCommentCounts] = useState<Record<string, number>>({}); // NEW: Store comment counts
   const { user } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     fetchBlogs();
     fetchTotalCount();
   }, [currentPage]);
+
+  // NEW: Fetch comment counts when blogs change
+  useEffect(() => {
+    if (blogs.length > 0) {
+      fetchCommentCounts();
+    }
+  }, [blogs]);
 
   // total number of blogs for pagination
   const fetchTotalCount = async () => {
@@ -46,6 +55,30 @@ export default function BlogList() {
       setTotalPages(Math.ceil((count || 0) / ITEMS_PER_PAGE));
     } catch (err: any) {
       console.error("Error fetching count:", err);
+    }
+  };
+
+  // NEW: Fetch comment counts for each blog
+  const fetchCommentCounts = async () => {
+    try {
+      const blogIds = blogs.map(blog => blog.id);
+      
+      const { data, error } = await supabase
+        .from("comments")
+        .select("blog_id")
+        .in("blog_id", blogIds);
+
+      if (error) throw error;
+
+      // Count comments per blog
+      const counts: Record<string, number> = {};
+      data?.forEach(comment => {
+        counts[comment.blog_id] = (counts[comment.blog_id] || 0) + 1;
+      });
+
+      setCommentCounts(counts);
+    } catch (err: any) {
+      console.error("Error fetching comment counts:", err);
     }
   };
 
@@ -284,6 +317,7 @@ export default function BlogList() {
               {blogs.map((blog) => {
                 const isOwner = user && user.id === blog.author_id;
                 const authorInitial = "U"; // Default initial
+                const commentCount = commentCounts[blog.id] || 0; // Get comment count for this blog
                 
                 return (
                   <div
@@ -356,16 +390,41 @@ export default function BlogList() {
                               </p>
                             </div>
                           </div>
-                          <Link
-                            to={`/blog/${blog.id}`}
-                            className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors"
-                          >
-                            Read More
-                            <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                            </svg>
-                          </Link>
+                          
+                          {/* NEW: Comment count and link */}
+                          <div className="flex items-center space-x-4">
+                            <div className="flex items-center text-sm text-gray-600">
+                              <svg className="w-4 h-4 mr-1 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                              </svg>
+                              <span className="font-medium">{commentCount}</span>
+                              <span className="ml-1">comment{commentCount !== 1 ? 's' : ''}</span>
+                            </div>
+                            <Link
+                              to={`/blog/${blog.id}#comments`}
+                              className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors"
+                            >
+                              View
+                              <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                              </svg>
+                            </Link>
+                          </div>
                         </div>
+                        
+                        {/* NEW: Comment preview (show latest comment if any) */}
+                        {commentCount > 0 && (
+                          <div className="mt-3 pt-3 border-t border-gray-100">
+                            <div className="flex items-start">
+                              <svg className="w-3 h-3 text-gray-400 mt-1 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                              </svg>
+                              <p className="text-xs text-gray-600 italic line-clamp-2">
+                                Has {commentCount} comment{commentCount !== 1 ? 's' : ''}. Click to view discussion...
+                              </p>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -467,6 +526,21 @@ export default function BlogList() {
                         </option>
                       ))}
                     </select>
+                  </div>
+                </div>
+                
+                {/* NEW: Total comments summary */}
+                <div className="mt-6 pt-6 border-t border-gray-100 text-center">
+                  <div className="inline-flex items-center text-sm text-gray-600">
+                    <svg className="w-4 h-4 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path>
+                    </svg>
+                    <span>
+                      Total comments on this page:{" "}
+                      <span className="font-semibold text-blue-600">
+                        {Object.values(commentCounts).reduce((sum, count) => sum + count, 0)}
+                      </span>
+                    </span>
                   </div>
                 </div>
               </div>
