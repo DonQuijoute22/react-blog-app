@@ -248,11 +248,11 @@ export default function BlogDetail() {
             </div>
           </div>
 
-          {/* Blog Content */}
+          {/* blog content */}
           <div className="p-8">
             <div className="prose prose-lg max-w-none">
               
-              {/* Render content with preserved formatting */}
+              {/* render content with preserved formatting */}
               <div className="whitespace-pre-wrap text-gray-700 leading-relaxed text-lg">
                 {blog.content.split('\n').map((paragraph, index) => (
                   <p key={index} className="mb-6">
@@ -263,7 +263,7 @@ export default function BlogDetail() {
             </div>
           </div>
 
-          {/* Footer */}
+          {/* footer */}
           <div className="p-8 border-t border-gray-200 bg-gray-50">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <div className="text-gray-600">
@@ -298,7 +298,7 @@ export default function BlogDetail() {
           {id && <Comments blogId={id} />} {/* Pass the blog ID to Comments component */}
         </div>
 
-        {/* Related Actions */}
+        {/* Related actions */}
         <div className="mt-8 flex flex-col sm:flex-row gap-4">
           <Link
             to="/"

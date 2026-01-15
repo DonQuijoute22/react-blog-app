@@ -251,7 +251,8 @@ export default function Comments({ blogId, onClose }: CommentsProps) {
 
   return (
     <div className="bg-white rounded-xl shadow-md p-6">
-      {/* Header */}
+      
+      {/* header */}
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-xl font-bold text-gray-900">
           Comments ({comments.length})
@@ -268,7 +269,7 @@ export default function Comments({ blogId, onClose }: CommentsProps) {
         )}
       </div>
 
-      {/* Comment Form */}
+      {/* comment form */}
       {user ? (
         <form onSubmit={handleSubmit} className="mb-8">
           <div className="mb-4">
@@ -282,7 +283,7 @@ export default function Comments({ blogId, onClose }: CommentsProps) {
             />
           </div>
 
-          {/* File Upload Section */}
+          {/* File upload section */}
           <div className="mb-6">
             <h4 className="text-sm font-medium text-gray-700 mb-3">
               Attach Files (Optional)
@@ -355,7 +356,7 @@ export default function Comments({ blogId, onClose }: CommentsProps) {
         </div>
       )}
 
-      {/* Comments List */}
+      {/* Comments list */}
       <div className="space-y-6">
         {comments.length === 0 ? (
           <div className="text-center py-10 text-gray-500">
@@ -374,7 +375,7 @@ export default function Comments({ blogId, onClose }: CommentsProps) {
               className="border border-gray-200 rounded-xl p-5 hover:border-gray-300 transition-all duration-200 bg-white"
             >
               {editingCommentId === comment.id ? (
-                // Edit Mode
+                // Edit mode
                 <div>
                   <textarea
                     value={editContent}
@@ -399,7 +400,7 @@ export default function Comments({ blogId, onClose }: CommentsProps) {
                   </div>
                 </div>
               ) : (
-                // View Mode
+                // view mode
                 <>
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex items-center space-x-3">
@@ -451,7 +452,7 @@ export default function Comments({ blogId, onClose }: CommentsProps) {
                     {comment.content}
                   </p>
 
-                  {/* File Attachments Display */}
+                  {/* file attachments display */}
                   {comment.attachments && comment.attachments.length > 0 && (
                     <div className="mt-5 pt-4 border-t border-gray-100">
                       <p className="text-sm font-medium text-gray-700 mb-3">
@@ -488,7 +489,7 @@ export default function Comments({ blogId, onClose }: CommentsProps) {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
                               </svg>
                             </div>
-                            {/* Image Preview */}
+                            {/* image preview */}
                             {attachment.file_type.includes('image') && (
                               <div className="mt-3">
                                 <img
