@@ -1,10 +1,10 @@
-// src/components/Comments.tsx (Updated)
 import React, { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
 import { useSelector } from "react-redux";
 import { type RootState } from "../store/store";
 import { type Comment as CommentType, type FileAttachment } from "../lib/types";
 import CommentFileUpload from "./CommentFileUpload";
+import { Link } from "react-router-dom";
 
 interface CommentsProps {
   blogId: string;
@@ -344,15 +344,15 @@ export default function Comments({ blogId, onClose }: CommentsProps) {
           </svg>
           <p className="text-gray-600 mb-2 font-medium">Join the conversation</p>
           <p className="text-gray-500 text-sm mb-4">Log in to share your thoughts and attach files</p>
-          <a
-            href="/login"
+          <Link
+                to="/login"
             className="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2 rounded-lg transition"
           >
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
             </svg>
             Login to Comment
-          </a>
+          </Link>
         </div>
       )}
 

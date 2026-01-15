@@ -9,7 +9,7 @@ export type Blog = {
   updated_at: string;
 };
 
-// Fetch blogs with pagination
+// fetch blogs with pagination
 export const fetchBlogs = async (page = 1, limit = 5) => {
   const from = (page - 1) * limit;
   const to = from + limit - 1;
@@ -19,7 +19,7 @@ export const fetchBlogs = async (page = 1, limit = 5) => {
     .select("*")
     .order("created_at", { ascending: false })
     .range(from, to)
-    .returns<Blog[]>();  // Use .returns() instead
+    .returns<Blog[]>();  
 
   if (error) throw error;
   return data;
@@ -32,7 +32,7 @@ export const createBlog = async (title: string, content: string) => {
     .insert([{ title, content }])
     .select()
     .single()
-    .returns<Blog>();  // Use .returns() instead
+    .returns<Blog>();  
 
   if (error) throw error;
   return data;
@@ -46,13 +46,13 @@ export const updateBlog = async (id: string, title: string, content: string) => 
     .eq("id", id)
     .select()
     .single()
-    .returns<Blog>();  // Use .returns() instead
+    .returns<Blog>();  
 
   if (error) throw error;
   return data;
 };
 
-// Delete blog
+// delete blog
 export const deleteBlog = async (id: string) => {
   const { error } = await supabase
     .from("blogs")

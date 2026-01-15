@@ -33,13 +33,14 @@ const CommentFileUpload: React.FC<CommentFileUploadProps> = ({
     
     try {
       for (const file of acceptedFiles) {
-        // Validate file size (10MB max)
+
+        // validate file size (10MB max)
         const maxSize = 10 * 1024 * 1024;
         if (file.size > maxSize) {
           throw new Error(`"${file.name}" exceeds 10MB limit`);
         }
 
-        // Create preview for images
+        // create preview for images
         if (file.type.startsWith('image/')) {
           const previewUrl = URL.createObjectURL(file);
           newPreviews[file.name] = previewUrl;
@@ -73,7 +74,7 @@ const CommentFileUpload: React.FC<CommentFileUploadProps> = ({
         uploadedResults.push(uploadedFile);
       }
 
-      // Update states
+      // update states
       const allUploadedFiles = [...uploadedFiles, ...uploadedResults];
       setUploadedFiles(allUploadedFiles);
       setPreviews(newPreviews);
@@ -118,12 +119,12 @@ const CommentFileUpload: React.FC<CommentFileUploadProps> = ({
     const fileToRemove = uploadedFiles[index];
     
     try {
-      // Delete file from storage
+      // delete file from storage
       await supabase.storage
         .from('comment-files')
         .remove([fileToRemove.path]);
       
-      // Clean up preview URL if exists
+      // clean up preview URL if exists
       if (previews[fileToRemove.file.name]) {
         URL.revokeObjectURL(previews[fileToRemove.file.name]);
         const newPreviews = { ...previews };
@@ -135,7 +136,7 @@ const CommentFileUpload: React.FC<CommentFileUploadProps> = ({
       const newFiles = uploadedFiles.filter((_, i) => i !== index);
       setUploadedFiles(newFiles);
       
-      // Update parent
+      // update parent
       onFilesUpload(newFiles);
     } catch (err: any) {
       setError(`Failed to remove file: ${err.message}`);
@@ -148,16 +149,16 @@ const CommentFileUpload: React.FC<CommentFileUploadProps> = ({
     if (!window.confirm(`Remove all ${uploadedFiles.length} files?`)) return;
     
     try {
-      // Delete all files from storage
+      // delete all files from storage
       const paths = uploadedFiles.map(file => file.path);
       await supabase.storage
         .from('comment-files')
         .remove(paths);
       
-      // Clean up all preview URLs
+      // clean up all preview URLs
       Object.values(previews).forEach(url => URL.revokeObjectURL(url));
       
-      // Clear all states
+      // clear all states
       setUploadedFiles([]);
       setPreviews({});
       onFilesUpload([]);
@@ -229,7 +230,7 @@ const CommentFileUpload: React.FC<CommentFileUploadProps> = ({
         )}
       </div>
 
-      {/* Uploaded files preview */}
+      {/* uploaded files preview */}
       {uploadedFiles.length > 0 && (
         <div className="space-y-3">
           <div className="flex justify-between items-center">
@@ -324,7 +325,7 @@ const CommentFileUpload: React.FC<CommentFileUploadProps> = ({
         </div>
       )}
 
-      {/* Storage usage info */}
+      {/* storage usage info */}
       {uploadedFiles.length > 0 && (
         <div className="text-xs text-gray-500 pt-2 border-t border-gray-100">
           <div className="flex justify-between">
